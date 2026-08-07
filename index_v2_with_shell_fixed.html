@@ -1,0 +1,861 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>TallyField — Free Field Survey Counter</title>
+<link rel="manifest" href="manifest.json" />
+<meta name="theme-color" content="#17181A" />
+<style>
+  :root{
+    --asphalt:#17181A; --panel:#212226; --panel-2:#2A2C31; --border:#3A3C42;
+    --text:#F2F0EA; --muted:#9A9CA3; --orange:#FF6A13; --yellow:#F5C518;
+    --green:#4CAF7D; --red:#E5484D; --mono:ui-monospace,'SF Mono','Cascadia Code',Consolas,monospace;
+    --disp:'Bahnschrift','Arial Narrow',sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0; background:var(--asphalt); color:var(--text); font-family:var(--disp);}
+
+  /* ---------- header ---------- */
+  header.sitehead{position:sticky; top:0; z-index:40; background:rgba(23,24,26,.92); backdrop-filter:blur(6px);
+    border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px;}
+  .logo{display:flex; align-items:center; gap:8px; font-weight:700; font-size:17px; letter-spacing:.01em; color:var(--text);
+    text-decoration:none;}
+  .logo .mark{width:22px; height:22px; background:var(--orange); border-radius:5px; display:inline-flex;
+    align-items:center; justify-content:center; color:#1a0c00; font-size:13px; font-weight:700;}
+  .brandstack{display:flex; flex-direction:column; align-items:flex-start; gap:8px;}
+  .siteclock{font-family:var(--mono); color:var(--yellow); font-size:30px; font-weight:700; letter-spacing:.06em; line-height:1;}
+  .siteclock small{display:block; font-family:var(--disp); color:var(--muted); font-size:9px; letter-spacing:.12em; margin:0 0 4px;}
+  nav.sitenav{display:flex; gap:22px;}
+  nav.sitenav a{color:var(--muted); text-decoration:none; font-size:13px; font-weight:700; letter-spacing:.02em;
+    padding:4px 2px; border-bottom:2px solid transparent;}
+  nav.sitenav a:hover{color:var(--text); border-bottom-color:var(--orange);}
+
+  /* ---------- hero ---------- */
+  .hero{max-width:760px; margin:0 auto; padding:56px 20px 30px; text-align:center;}
+  .hero .eyebrow{color:var(--orange); font-size:12px; letter-spacing:.16em; text-transform:uppercase; margin:0 0 10px; font-weight:700;}
+  .hero h1{font-size:32px; margin:0 0 14px; line-height:1.25;}
+  .hero p{color:var(--muted); font-size:14px; line-height:1.6; max-width:520px; margin:0 auto 22px;}
+  .herobtn{display:inline-block; background:var(--orange); color:#1a0c00; text-decoration:none; font-weight:700;
+    font-size:14px; padding:12px 22px; border-radius:8px;}
+
+  /* ---------- tool embed section ---------- */
+  #tool-embed{padding:10px 20px 60px;}
+
+  /* ---------- tools section ---------- */
+  .toolssection{max-width:900px; margin:0 auto; padding:40px 20px 60px; border-top:1px solid var(--border);}
+  .sectiontitle{font-size:22px; margin:0 0 6px;}
+  .sectionsub{color:var(--muted); font-size:13px; margin:0 0 26px;}
+  .toolgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
+  .toolcard{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:left;}
+  .toolcard.active{border-color:var(--orange);}
+  .toolcard .ticon{width:34px; height:34px; border-radius:8px; background:var(--panel-2); display:flex;
+    align-items:center; justify-content:center; font-size:17px; margin-bottom:10px;}
+  .toolcard.active .ticon{background:var(--orange); color:#1a0c00;}
+  .toolcard h3{font-size:15px; margin:0 0 6px;}
+  .toolcard p{font-size:12px; color:var(--muted); margin:0 0 12px; line-height:1.5;}
+  .toolcard .taglink{font-size:12px; color:var(--orange); text-decoration:none; font-weight:700;}
+  .toolcard.soon{opacity:.55;}
+  .toolcard.soon .taglink{color:var(--muted);}
+
+  /* ---------- contact / footer ---------- */
+  .contactsection{max-width:700px; margin:0 auto; padding:40px 20px 20px; border-top:1px solid var(--border); text-align:center;}
+  .contactsection p{color:var(--muted); font-size:13px; line-height:1.7;}
+  .contactsection a{color:var(--yellow); text-decoration:none;}
+  footer.sitefoot{text-align:center; padding:20px; color:var(--muted); font-size:11px; border-top:1px solid var(--border);}
+
+  @media (max-width:520px){
+    nav.sitenav{gap:14px;}
+    nav.sitenav a{font-size:12px;}
+    .hero h1{font-size:24px;}
+    .siteclock{font-size:24px;}
+  }
+</style>
+</head>
+<body>
+
+<header class="sitehead">
+  <div class="brandstack">
+    <a class="logo" href="#home"><span class="mark">▲</span>TallyField</a>
+    <div class="siteclock"><small>เวลาไทย</small><span id="siteclock">00:00:00</span></div>
+  </div>
+  <nav class="sitenav">
+    <a href="#home">หน้าหลัก</a>
+    <a href="#tools">เครื่องมือต่างๆ</a>
+    <a href="#contact">ติดต่อ</a>
+  </nav>
+</header>
+
+<section class="hero" id="home">
+  <p class="eyebrow">Free field survey tool</p>
+  <h1>นับข้อมูลภาคสนามให้แม่นยำ<br>ไม่ต้องพกกระดาษอีกต่อไป</h1>
+  <p>เครื่องมือนับจราจร/สำรวจแบบออกแบบเองได้ ใช้งานฟรี ไม่ต้องติดตั้งแอป
+     เปิดผ่านเบราว์เซอร์บนมือถือได้ทันที พร้อมนาฬิกาซิงค์เวลา และ export ข้อมูลเป็น CSV</p>
+  <a class="herobtn" href="#tool-embed">เริ่มใช้งานเลย ↓</a>
+</section>
+
+<div id="tool-embed">
+<!-- ==== TALLY COUNTER TOOL (unchanged app logic below) ==== -->
+<style>
+  .tc{background:var(--asphalt); color:var(--text); font-family:var(--disp);
+    border-radius:16px; padding:20px; max-width:520px; margin:0 auto; min-height:420px; position:relative;
+    border:1px solid var(--border);}
+  .tc.field-mode{max-width:1180px; width:calc(100vw - 32px);}
+  .eyebrow2{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--orange); margin:0 0 2px;}
+  .titlerow{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px;}
+  .title{font-size:20px; font-weight:700; margin:0;}
+  .backbtn{background:transparent; border:1px solid var(--border); color:var(--text); border-radius:6px;
+    padding:6px 10px; font-size:12px; cursor:pointer; font-family:var(--disp); flex-shrink:0;}
+  .primary{background:var(--orange); border:1px solid var(--orange); color:#1a0c00; border-radius:8px;
+    padding:12px 14px; font-size:13px; cursor:pointer; font-family:var(--disp); font-weight:700; width:100%;}
+  .secondary{background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:8px;
+    padding:10px 14px; font-size:12px; cursor:pointer; font-family:var(--disp); font-weight:700; width:100%;}
+  .danger{background:transparent; border:1px solid var(--red); color:var(--red); border-radius:8px;
+    padding:10px 14px; font-size:12px; cursor:pointer; font-family:var(--disp); font-weight:700; width:100%;}
+  .surveycard{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 14px;
+    margin-bottom:10px; display:flex; align-items:center; justify-content:space-between; gap:10px;}
+  .surveyname{font-size:15px; font-weight:700;}
+  .surveymeta{font-size:11px; color:var(--muted); margin-top:2px;}
+  .cardbtns{display:flex; gap:6px; flex-shrink:0;}
+  .smallbtn{background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:6px;
+    padding:6px 10px; font-size:12px; cursor:pointer; font-family:var(--disp);}
+  .smallbtn.start{background:var(--orange); border-color:var(--orange); color:#1a0c00; font-weight:700;}
+  .smallbtn.del{color:var(--red); border-color:var(--red);}
+  .emptystate{color:var(--muted); font-size:13px; text-align:center; padding:30px 10px;}
+  .field{margin-bottom:12px;}
+  .flabel{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em; margin:0 0 6px;}
+  .field input[type=text], .field input[type=date]{width:100%; background:var(--panel-2); border:1px solid var(--border);
+    color:var(--text); border-radius:6px; padding:9px 10px; font-family:var(--disp); font-size:14px;}
+  .catrow{display:flex; gap:6px; margin-bottom:8px;}
+  .catrow input{flex:1;}
+  .catrow button{background:transparent; border:1px solid var(--border); color:var(--red); border-radius:6px;
+    padding:0 10px; cursor:pointer; font-size:14px;}
+  .addcatbtn{background:transparent; border:1px dashed var(--border); color:var(--muted); border-radius:6px;
+    padding:8px; width:100%; cursor:pointer; font-family:var(--disp); font-size:12px; margin-bottom:10px;}
+  .presetgrid{display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px;}
+  .presetchip{background:var(--panel-2); border:1px solid var(--border); color:var(--muted); border-radius:20px;
+    padding:6px 12px; font-size:12px; cursor:pointer; font-family:var(--disp);}
+  .presetchip.on{background:var(--orange); border-color:var(--orange); color:#1a0c00; font-weight:700;}
+  .errtext{color:var(--red); font-size:11px; margin:-6px 0 10px;}
+  .btnrow{display:flex; gap:8px;}
+  .clockcard{background:#000; border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:12px;}
+  .clock{font-family:var(--mono); font-size:26px; font-weight:700; letter-spacing:.03em; color:var(--yellow);}
+  .zonerow select{width:100%; margin-top:6px; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:5px 8px; font-family:var(--disp); font-size:11px;}
+  .wakerow{font-size:10px; color:var(--muted); margin-top:6px; display:flex; align-items:center; gap:5px;}
+  .dot{width:6px; height:6px; border-radius:50%; display:inline-block;}
+  .totalcard{background:var(--panel-2); border:1px solid var(--orange); border-radius:10px; padding:10px 14px;
+    margin-bottom:12px; display:flex; justify-content:space-between; align-items:center;}
+  .totalcard .tlabel{font-size:11px; color:var(--muted); text-transform:uppercase; letter-spacing:.06em;}
+  .totalcard .tnum{font-family:var(--mono); font-size:26px; font-weight:700; color:var(--yellow);}
+  .counterlist{margin-bottom:12px;}
+  .counter{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px 12px;
+    margin-bottom:10px; display:flex; align-items:center; gap:10px;}
+  .clabel{font-size:13px; flex:1; word-break:break-word;}
+  .cnum{font-family:var(--mono); font-size:28px; font-weight:700; min-width:44px; text-align:center;}
+  .cbtn{border-radius:8px; font-size:22px; cursor:pointer; border:1px solid var(--border);
+    font-family:var(--disp); font-weight:700; background:var(--panel-2); color:var(--text);
+    width:52px; height:52px; flex-shrink:0;}
+  .cbtn.plus{background:var(--orange); border-color:var(--orange); color:#1a0c00;}
+  .cbtn:active{transform:scale(.93);}
+  .fieldactions{display:flex; gap:8px; align-items:center;}
+  .fieldmodebtn{width:auto; white-space:nowrap;}
+  .tc.field-mode .counterlist{display:grid; grid-template-columns:repeat(4,minmax(0,1fr)); gap:10px;}
+  .tc.field-mode .counter{margin:0; min-height:110px; display:grid; grid-template-columns:1fr 52px; grid-template-rows:auto 1fr; gap:7px 10px; align-items:center;}
+  .tc.field-mode .clabel{grid-column:1 / -1; font-weight:700; min-height:18px;}
+  .tc.field-mode .cnum{grid-column:1; grid-row:2; justify-self:start; font-size:34px;}
+  .tc.field-mode .cbtn{grid-column:2; width:52px; height:52px;}
+  .tc.field-mode .cbtn.minus{display:none;}
+  .tc.field-mode .cbtn.plus{grid-row:2;}
+  @media (max-width:900px){
+    .tc.field-mode .counterlist{grid-template-columns:repeat(3,minmax(0,1fr));}
+  }
+  @media (max-width:620px){
+    .tc.field-mode{padding:14px;}
+    .tc.field-mode .counterlist{grid-template-columns:repeat(2,minmax(0,1fr));}
+    .tc.field-mode .counter{min-height:96px; padding:9px;}
+    .tc.field-mode .cnum{font-size:29px;}
+    .fieldmodebtn{font-size:10px; padding:6px 8px;}
+  }
+  @media (orientation:landscape) and (max-height:720px){
+    #tool-embed{padding:6px 8px 20px;}
+    .tc.field-mode{width:calc(100vw - 16px); max-width:none; padding:14px 18px;}
+    .tc.field-mode .counterlist{grid-template-columns:repeat(2,minmax(0,1fr)); gap:12px;}
+    .tc.field-mode .counter{min-height:92px; padding:10px 12px;}
+    .tc.field-mode .cbtn{width:56px; height:56px; font-size:25px;}
+    .tc.field-mode .cnum{font-size:34px;}
+  }
+  .tc:fullscreen{width:100vw; max-width:none; min-height:100vh; border-radius:0; border:0; overflow:auto;}
+  .intervalcard{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:12px 14px; margin-bottom:12px;}
+  .intervalrow{display:flex; gap:8px; align-items:center; margin-bottom:8px;}
+  .intervalrow select{flex:1; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:6px 8px; font-family:var(--disp); font-size:12px;}
+  .intervaltimer{font-family:var(--mono); font-size:20px; font-weight:700; color:var(--green); min-width:60px; text-align:right;}
+  .feedcard{background:var(--panel); border:1px solid var(--border); border-radius:10px; padding:10px 14px; margin-bottom:12px;
+    max-height:110px; overflow-y:auto;}
+  .feeditem{font-size:11px; color:var(--muted); font-family:var(--mono); padding:2px 0;}
+  .historytable{width:100%; border-collapse:collapse; font-size:11px; margin-top:6px;}
+  .historytable th{text-align:right; color:var(--muted); font-weight:400; padding:3px 2px; border-bottom:1px solid var(--border);}
+  .historytable th:first-child,.historytable td:first-child{text-align:left;}
+  .historytable td{text-align:right; padding:3px 2px; border-bottom:1px solid var(--border); font-family:var(--mono);}
+  .metafield{margin-bottom:8px;}
+  .metafield input{width:100%; background:var(--panel-2); border:1px solid var(--border); color:var(--text);
+    border-radius:6px; padding:7px 9px; font-family:var(--disp); font-size:12px;}
+  .locbtn{background:var(--panel-2); border:1px solid var(--border); color:var(--muted); border-radius:6px;
+    padding:6px 10px; font-size:11px; cursor:pointer; font-family:var(--disp); width:100%; margin-bottom:8px;}
+  .locstatus{font-size:10px; color:var(--muted); margin:-4px 0 8px;}
+  .hidden{display:none;}
+  .modalbg{position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center;
+    z-index:50;}
+  .modalbg.hidden{display:none;}
+  .modalbox{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px; width:80%; max-width:340px;}
+  .modaltext{font-size:13px; margin:0 0 14px; line-height:1.4;}
+  .modalbtns{display:flex; gap:8px;}
+</style>
+
+<div class="tc" id="app">
+
+  <div id="view-list">
+    <div class="titlerow">
+      <div><p class="eyebrow2">field tool</p><p class="title">My surveys</p></div>
+    </div>
+    <div id="surveylist"></div>
+    <button class="primary" id="newsurveybtn">+ New survey</button>
+  </div>
+
+  <div id="view-builder" class="hidden">
+    <div class="titlerow">
+      <div><p class="eyebrow2">setup</p><p class="title">Build survey</p></div>
+      <button class="backbtn" data-nav="list">Cancel</button>
+    </div>
+    <div class="field">
+      <p class="flabel">Survey name</p>
+      <input type="text" id="surveyname" placeholder="e.g. Intersection AM peak count" maxlength="40" />
+    </div>
+    <div class="field">
+      <p class="flabel">Surveyor name</p>
+      <input type="text" id="surveyorname" placeholder="Your name" maxlength="40" />
+    </div>
+    <div class="field">
+      <p class="flabel">Standard vehicle categories (tap to add)</p>
+      <div class="presetgrid" id="presetgrid"></div>
+    </div>
+    <div class="field">
+      <p class="flabel">Counters to track</p>
+      <div id="catrows"></div>
+      <button class="addcatbtn" id="addcatbtn">+ Add custom counter</button>
+      <div class="errtext hidden" id="catserr"></div>
+    </div>
+    <button class="primary" id="savestartbtn">Save and start counting</button>
+  </div>
+
+  <div id="view-counter" class="hidden">
+    <div class="titlerow">
+      <div><p class="eyebrow2" id="sessionlabel">session</p><p class="title" id="sessiontitle">Survey</p></div>
+      <div class="fieldactions">
+        <button class="secondary fieldmodebtn" id="fieldmodebtn" type="button">โหมดภาคสนาม</button>
+        <button class="backbtn" data-nav="list">Back</button>
+      </div>
+    </div>
+
+    <div class="clockcard">
+      <div class="clock" id="clock">00:00:00</div>
+      <div class="zonerow">
+        <select id="zoneselect">
+          <option value="Asia/Bangkok">Bangkok (ICT)</option>
+          <option value="local">Device local time</option>
+          <option value="UTC">UTC</option>
+          <option value="Asia/Tokyo">Tokyo (JST)</option>
+          <option value="Asia/Singapore">Singapore (SGT)</option>
+          <option value="Europe/London">London (GMT/BST)</option>
+          <option value="America/New_York">New York (ET)</option>
+          <option value="America/Los_Angeles">Los Angeles (PT)</option>
+          <option value="Australia/Sydney">Sydney (AEST)</option>
+        </select>
+      </div>
+      <div class="wakerow"><span class="dot" id="wakedot" style="background:var(--muted)"></span><span id="wakestatus">Screen lock: checking…</span></div>
+    </div>
+
+    <button class="locbtn" id="captureloc">📍 Capture GPS location</button>
+    <div class="locstatus" id="locstatus">No location captured yet</div>
+    <div class="metafield">
+      <input type="text" id="weathernotes" placeholder="Weather / conditions note (optional)" maxlength="80" />
+    </div>
+
+    <div class="totalcard">
+      <span class="tlabel">Total (this interval)</span>
+      <span class="tnum" id="totalnum">0</span>
+    </div>
+
+    <div class="counterlist" id="countergrid"></div>
+
+    <div class="addcounterrow" style="display:flex; gap:6px; margin-bottom:8px;">
+      <input type="text" id="newcountername" placeholder="+ Add counter now, e.g. Bicycle" maxlength="24"
+        style="flex:1; background:var(--panel-2); border:1px solid var(--border); color:var(--text); border-radius:6px; padding:9px 10px; font-family:var(--disp); font-size:13px;" />
+      <button class="smallbtn start" id="addcounterbtn" style="flex-shrink:0;">Add</button>
+    </div>
+    <div class="errtext hidden" id="addcountererr" style="margin-bottom:10px;"></div>
+
+    <div class="btnrow" style="margin-bottom:12px;">
+      <button class="secondary" id="undobtn">↩ Undo last</button>
+      <button class="danger" id="resetcounts">Reset counts</button>
+    </div>
+
+    <div class="intervalcard">
+      <p class="flabel">Auto interval</p>
+      <div class="intervalrow">
+        <select id="intervallen"></select>
+        <span class="intervaltimer" id="intervaltimer">--:--</span>
+      </div>
+      <div class="btnrow">
+        <button class="secondary" id="intervalstart">Start interval</button>
+        <button class="secondary" id="intervallog">Log now</button>
+      </div>
+      <div id="historywrap"></div>
+    </div>
+
+    <div class="feedcard">
+      <div class="flabel" style="margin-bottom:6px;">Recent activity</div>
+      <div id="feedwrap"></div>
+    </div>
+
+    <div class="btnrow">
+      <button class="secondary" id="exportraw">Export raw log CSV</button>
+      <button class="secondary" id="exportsummary">Export interval CSV</button>
+    </div>
+  </div>
+
+  <div class="modalbg hidden" id="modalbg">
+    <div class="modalbox">
+      <p class="modaltext" id="modaltext">Are you sure?</p>
+      <div class="modalbtns">
+        <button class="secondary" id="modalcancel">Cancel</button>
+        <button class="danger" id="modalconfirm">Confirm</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+(function(){
+  var TEMPLATES_KEY="survey_templates_v2";
+  var SESSION_KEY_PREFIX="survey_session_v2_";
+  var ZONE_KEY="tc_zone_pref";
+
+  var PRESETS=["Motorcycle","Car (sedan)","Pickup","Truck 2-6 wheels","Large truck (>6 wheels)","Bus","Bicycle","Pedestrian"];
+
+  var templates=JSON.parse(localStorage.getItem(TEMPLATES_KEY)||"null")||[];
+  var nextTid=Math.max.apply(null,templates.map(function(t){return t.id;}).concat([0]))+1;
+  var activeTemplateId=null;
+  var wakeLock=null;
+  var intervalHandle=null;
+
+  function saveTemplates(){ localStorage.setItem(TEMPLATES_KEY,JSON.stringify(templates)); }
+  function escapeHtml(s){ return s.replace(/[&<>"']/g,function(ch){ return ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"})[ch]; }); }
+
+  var pendingConfirm=null;
+  function askConfirm(msg,onYes){
+    document.getElementById("modaltext").textContent=msg;
+    pendingConfirm=onYes;
+    document.getElementById("modalbg").classList.remove("hidden");
+  }
+  document.getElementById("modalcancel").addEventListener("click",function(){
+    document.getElementById("modalbg").classList.add("hidden"); pendingConfirm=null;
+  });
+  document.getElementById("modalconfirm").addEventListener("click",function(){
+    document.getElementById("modalbg").classList.add("hidden");
+    if(pendingConfirm) pendingConfirm();
+    pendingConfirm=null;
+  });
+
+  function buzz(ms){ try{ if(navigator.vibrate) navigator.vibrate(ms); }catch(e){} }
+  function beep(freq){
+    try{
+      var ctx=new (window.AudioContext||window.webkitAudioContext)();
+      var o=ctx.createOscillator(), g=ctx.createGain();
+      o.connect(g); g.connect(ctx.destination);
+      o.frequency.value=freq||880; g.gain.value=0.05;
+      o.start(); setTimeout(function(){ o.stop(); ctx.close(); },70);
+    }catch(e){}
+  }
+  function tapFeedback(){ buzz(15); beep(880); }
+
+  async function requestWakeLock(){
+    var dot=document.getElementById("wakedot"), status=document.getElementById("wakestatus");
+    try{
+      if(!("wakeLock" in navigator)) throw new Error("unsupported");
+      wakeLock=await navigator.wakeLock.request("screen");
+      dot.style.background="var(--green)"; status.textContent="Screen lock: active";
+      wakeLock.addEventListener("release",function(){
+        dot.style.background="var(--muted)"; status.textContent="Screen lock: released";
+      });
+    }catch(e){
+      dot.style.background="var(--muted)";
+      status.textContent="Screen lock: unavailable in this browser/context";
+    }
+  }
+  function releaseWakeLock(){ if(wakeLock){ try{ wakeLock.release(); }catch(e){} wakeLock=null; } }
+
+  function showView(name){
+    document.getElementById("app").classList.toggle("field-mode",name==="counter");
+    ["list","builder","counter"].forEach(function(v){
+      document.getElementById("view-"+v).classList.toggle("hidden", v!==name);
+    });
+    if(name==="counter"){ requestWakeLock(); } else {
+      releaseWakeLock();
+      if(intervalHandle){clearInterval(intervalHandle); intervalHandle=null;}
+      if(document.fullscreenElement){ document.exitFullscreen().catch(function(){}); }
+      if(screen.orientation && screen.orientation.unlock){ screen.orientation.unlock(); }
+    }
+  }
+  document.querySelectorAll("[data-nav]").forEach(function(btn){
+    btn.addEventListener("click",function(){ showView(btn.dataset.nav); renderList(); });
+  });
+
+  function updateFieldModeLabel(){
+    var btn=document.getElementById("fieldmodebtn");
+    btn.textContent=document.fullscreenElement ? "ออกจากโหมดภาคสนาม" : "โหมดภาคสนาม";
+  }
+  document.getElementById("fieldmodebtn").addEventListener("click",async function(){
+    try{
+      if(document.fullscreenElement){
+        await document.exitFullscreen();
+        if(screen.orientation && screen.orientation.unlock){ screen.orientation.unlock(); }
+      }else{
+        await document.getElementById("app").requestFullscreen();
+        if(screen.orientation && screen.orientation.lock){
+          try{ await screen.orientation.lock("landscape"); }catch(e){}
+        }
+      }
+    }catch(e){}
+    updateFieldModeLabel();
+  });
+  document.addEventListener("fullscreenchange",updateFieldModeLabel);
+
+  function renderList(){
+    var wrap=document.getElementById("surveylist");
+    if(templates.length===0){
+      wrap.innerHTML='<div class="emptystate">No surveys yet.<br>Tap "New survey" to build your first counter set.</div>';
+      return;
+    }
+    wrap.innerHTML="";
+    templates.forEach(function(t){
+      var card=document.createElement("div");
+      card.className="surveycard";
+      card.innerHTML='<div><div class="surveyname">'+escapeHtml(t.name)+'</div>'+
+        '<div class="surveymeta">'+t.categories.length+' counters · '+escapeHtml(t.surveyorName||"—")+'</div></div>'+
+        '<div class="cardbtns">'+
+          '<button class="smallbtn start" data-start="'+t.id+'">Start</button>'+
+          '<button class="smallbtn del" data-deltpl="'+t.id+'">Delete</button>'+
+        '</div>';
+      wrap.appendChild(card);
+    });
+  }
+  document.getElementById("surveylist").addEventListener("click",function(e){
+    var start=e.target.closest("[data-start]");
+    var del=e.target.closest("[data-deltpl]");
+    if(start){ openCounter(parseInt(start.dataset.start,10)); }
+    if(del){
+      var tid=del.dataset.deltpl;
+      var t=templates.find(function(x){return x.id==tid;});
+      askConfirm('Delete survey "'+(t?t.name:"")+'"? This cannot be undone.',function(){
+        templates=templates.filter(function(x){return x.id!=tid;});
+        localStorage.removeItem(SESSION_KEY_PREFIX+tid);
+        saveTemplates(); renderList();
+      });
+    }
+  });
+
+  var selectedPresets=[];
+  function renderPresetGrid(){
+    var wrap=document.getElementById("presetgrid");
+    wrap.innerHTML="";
+    PRESETS.forEach(function(p){
+      var chip=document.createElement("button");
+      chip.type="button"; chip.className="presetchip"+(selectedPresets.indexOf(p)>=0?" on":"");
+      chip.textContent=p; chip.dataset.preset=p;
+      wrap.appendChild(chip);
+    });
+  }
+  document.getElementById("presetgrid").addEventListener("click",function(e){
+    var chip=e.target.closest(".presetchip");
+    if(!chip) return;
+    var p=chip.dataset.preset;
+    var idx=selectedPresets.indexOf(p);
+    if(idx>=0){
+      selectedPresets.splice(idx,1);
+      Array.prototype.forEach.call(document.querySelectorAll("#catrows .catrow"),function(row){
+        var input=row.querySelector("input");
+        if(input.value===p) row.remove();
+      });
+    } else {
+      selectedPresets.push(p);
+      addCatRow(p);
+    }
+    renderPresetGrid();
+  });
+
+  function addCatRow(value){
+    var row=document.createElement("div");
+    row.className="catrow";
+    row.innerHTML='<input type="text" placeholder="Counter name" maxlength="24" value="'+(value?escapeHtml(value):"")+'" />'+
+      '<button type="button" aria-label="Remove">&times;</button>';
+    row.querySelector("button").addEventListener("click",function(){ row.remove(); });
+    document.getElementById("catrows").appendChild(row);
+  }
+  document.getElementById("addcatbtn").addEventListener("click",function(){ addCatRow(); });
+
+  document.getElementById("newsurveybtn").addEventListener("click",function(){
+    document.getElementById("surveyname").value="";
+    document.getElementById("surveyorname").value="";
+    document.getElementById("catserr").classList.add("hidden");
+    selectedPresets=[];
+    document.getElementById("catrows").innerHTML="";
+    renderPresetGrid();
+    showView("builder");
+  });
+
+  document.getElementById("savestartbtn").addEventListener("click",function(){
+    var name=document.getElementById("surveyname").value.trim();
+    var surveyor=document.getElementById("surveyorname").value.trim();
+    var cats=Array.prototype.map.call(document.querySelectorAll("#catrows input"),function(i){return i.value.trim();})
+      .filter(function(v){return v.length>0;});
+    var errBox=document.getElementById("catserr");
+    errBox.classList.add("hidden");
+    if(!name){ document.getElementById("surveyname").focus(); return; }
+    if(cats.length===0){ errBox.textContent="Add at least one counter."; errBox.classList.remove("hidden"); return; }
+    var lower=cats.map(function(c){return c.toLowerCase();});
+    var dupes=lower.filter(function(v,i){return lower.indexOf(v)!==i;});
+    if(dupes.length>0){
+      errBox.textContent='Duplicate counter name: "'+dupes[0]+'". Please rename it.';
+      errBox.classList.remove("hidden");
+      return;
+    }
+    var t={id:nextTid++, name:name, surveyorName:surveyor, categories:cats, createdAt:new Date().toISOString()};
+    templates.push(t); saveTemplates();
+    openCounter(t.id);
+  });
+
+  function getSession(tid){ return JSON.parse(localStorage.getItem(SESSION_KEY_PREFIX+tid)||"null"); }
+  function saveSession(tid,s){ localStorage.setItem(SESSION_KEY_PREFIX+tid,JSON.stringify(s)); }
+
+  function newSession(catCount){
+    return { counts:new Array(catCount).fill(0), rawLog:[], intervalHistory:[], location:null, weather:"",
+      intervalLen:900, intervalRemaining:900, intervalRunning:false };
+  }
+
+  function nowLabel(){
+    var zone=localStorage.getItem(ZONE_KEY)||"Asia/Bangkok";
+    var opts={hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false};
+    if(zone!=="local"){ opts.timeZone=zone; }
+    return new Intl.DateTimeFormat("en-GB",opts).format(new Date());
+  }
+
+  function openCounter(tid){
+    var t=templates.find(function(x){return x.id===tid;});
+    if(!t) return;
+    activeTemplateId=tid;
+    document.getElementById("sessiontitle").textContent=t.name;
+    document.getElementById("sessionlabel").textContent="surveyor: "+(t.surveyorName||"—");
+    var s=getSession(tid);
+    if(!s || s.counts.length!==t.categories.length){ s=newSession(t.categories.length); saveSession(tid,s); }
+    document.getElementById("weathernotes").value=s.weather||"";
+    populateIntervalOptions(s.intervalLen||900);
+    updateLocStatus(s);
+    renderCounterList(t,s);
+    renderTotal(s);
+    renderFeed(s);
+    renderHistory(s);
+    renderIntervalTimer(s);
+    var zonesel=document.getElementById("zoneselect");
+    zonesel.value=localStorage.getItem(ZONE_KEY)||"Asia/Bangkok";
+    showView("counter");
+  }
+
+  function populateIntervalOptions(selectedSeconds){
+    var sel=document.getElementById("intervallen");
+    var html='<option value="0">Off (manual only)</option>';
+    for(var m=1;m<=60;m++){
+      html+='<option value="'+(m*60)+'">'+m+(m===1?" minute":" minutes")+'</option>';
+    }
+    sel.innerHTML=html;
+    sel.value=String(selectedSeconds);
+  }
+
+  function renderTotal(s){
+    document.getElementById("totalnum").textContent=s.counts.reduce(function(a,b){return a+b;},0);
+  }
+
+  function renderCounterList(t,s){
+    var grid=document.getElementById("countergrid");
+    grid.innerHTML="";
+    t.categories.forEach(function(cat,idx){
+      var box=document.createElement("div");
+      box.className="counter";
+      box.innerHTML='<div class="clabel">'+escapeHtml(cat)+'</div>'+
+        '<div class="cnum" data-idx="'+idx+'">'+s.counts[idx]+'</div>'+
+        '<button class="cbtn minus" data-minus="'+idx+'">−</button>'+
+        '<button class="cbtn plus" data-plus="'+idx+'">+</button>';
+      grid.appendChild(box);
+    });
+  }
+
+  document.getElementById("countergrid").addEventListener("click",function(e){
+    var plus=e.target.closest("[data-plus]");
+    var minus=e.target.closest("[data-minus]");
+    if(!plus && !minus) return;
+    var s=getSession(activeTemplateId);
+    var idx=plus?parseInt(plus.dataset.plus,10):parseInt(minus.dataset.minus,10);
+    var delta=plus?1:-1;
+    if(delta<0 && s.counts[idx]<=0) return;
+    s.counts[idx]+=delta;
+    s.rawLog.push({t:nowLabel(), idx:idx, delta:delta});
+    saveSession(activeTemplateId,s);
+    document.querySelector('#countergrid [data-idx="'+idx+'"]').textContent=s.counts[idx];
+    renderTotal(s); renderFeed(s);
+    tapFeedback();
+  });
+
+  function addCounterMidSession(){
+    var input=document.getElementById("newcountername");
+    var errBox=document.getElementById("addcountererr");
+    errBox.classList.add("hidden");
+    var name=input.value.trim();
+    if(!name) return;
+    var t=templates.find(function(x){return x.id===activeTemplateId;});
+    var lowerExisting=t.categories.map(function(c){return c.toLowerCase();});
+    if(lowerExisting.indexOf(name.toLowerCase())>=0){
+      errBox.textContent='A counter named "'+name+'" already exists.';
+      errBox.classList.remove("hidden");
+      return;
+    }
+    t.categories.push(name);
+    saveTemplates();
+    var s=getSession(activeTemplateId);
+    s.counts.push(0);
+    saveSession(activeTemplateId,s);
+    renderCounterList(t,s);
+    renderTotal(s);
+    input.value="";
+    buzz(15);
+  }
+  document.getElementById("addcounterbtn").addEventListener("click",addCounterMidSession);
+  document.getElementById("newcountername").addEventListener("keydown",function(e){
+    if(e.key==="Enter"){ addCounterMidSession(); }
+  });
+
+  document.getElementById("undobtn").addEventListener("click",function(){
+    var s=getSession(activeTemplateId);
+    if(s.rawLog.length===0) return;
+    var last=s.rawLog.pop();
+    s.counts[last.idx]-=last.delta;
+    if(s.counts[last.idx]<0) s.counts[last.idx]=0;
+    saveSession(activeTemplateId,s);
+    var t=templates.find(function(x){return x.id===activeTemplateId;});
+    renderCounterList(t,s); renderTotal(s); renderFeed(s);
+    buzz(30);
+  });
+
+  document.getElementById("resetcounts").addEventListener("click",function(){
+    askConfirm("Reset all counts for this interval? This cannot be undone.",function(){
+      var t=templates.find(function(x){return x.id===activeTemplateId;});
+      var s=getSession(activeTemplateId);
+      s.counts=new Array(t.categories.length).fill(0);
+      saveSession(activeTemplateId,s);
+      renderCounterList(t,s); renderTotal(s);
+    });
+  });
+
+  function renderFeed(s){
+    var wrap=document.getElementById("feedwrap");
+    var t=templates.find(function(x){return x.id===activeTemplateId;});
+    var recent=s.rawLog.slice(-6).reverse();
+    if(recent.length===0){ wrap.innerHTML='<div class="feeditem">No taps yet.</div>'; return; }
+    wrap.innerHTML=recent.map(function(r){
+      return '<div class="feeditem">'+(r.delta>0?"+1":"−1")+" "+escapeHtml(t.categories[r.idx])+" at "+r.t+"</div>";
+    }).join("");
+  }
+
+  function updateLocStatus(s){
+    var el=document.getElementById("locstatus");
+    el.textContent=s.location ? ("Location: "+s.location.lat+", "+s.location.lng) : "No location captured yet";
+  }
+  document.getElementById("captureloc").addEventListener("click",function(){
+    var el=document.getElementById("locstatus");
+    if(!navigator.geolocation){ el.textContent="Geolocation not supported in this browser."; return; }
+    el.textContent="Requesting location…";
+    navigator.geolocation.getCurrentPosition(function(pos){
+      var s=getSession(activeTemplateId);
+      s.location={lat:pos.coords.latitude.toFixed(5), lng:pos.coords.longitude.toFixed(5)};
+      saveSession(activeTemplateId,s);
+      updateLocStatus(s);
+    },function(err){
+      el.textContent="Unavailable ("+err.message+").";
+    },{timeout:6000});
+  });
+
+  document.getElementById("weathernotes").addEventListener("change",function(){
+    var s=getSession(activeTemplateId);
+    s.weather=this.value;
+    saveSession(activeTemplateId,s);
+  });
+
+  function renderIntervalTimer(s){
+    var m=Math.floor(s.intervalRemaining/60), sec=s.intervalRemaining%60;
+    document.getElementById("intervaltimer").textContent=
+      s.intervalLen===0 ? "--:--" : String(m).padStart(2,"0")+":"+String(sec).padStart(2,"0");
+  }
+
+  document.getElementById("intervallen").addEventListener("change",function(){
+    var s=getSession(activeTemplateId);
+    s.intervalLen=parseInt(this.value,10);
+    s.intervalRemaining=s.intervalLen;
+    saveSession(activeTemplateId,s);
+    renderIntervalTimer(s);
+  });
+
+  document.getElementById("intervalstart").addEventListener("click",function(){
+    var s=getSession(activeTemplateId);
+    if(s.intervalLen===0) return;
+    if(intervalHandle){ clearInterval(intervalHandle); intervalHandle=null; s.intervalRunning=false; saveSession(activeTemplateId,s); this.textContent="Start interval"; return; }
+    s.intervalRunning=true; saveSession(activeTemplateId,s);
+    this.textContent="Pause interval";
+    intervalHandle=setInterval(function(){
+      var cur=getSession(activeTemplateId);
+      cur.intervalRemaining--;
+      if(cur.intervalRemaining<=0){
+        logInterval(cur);
+        cur.intervalRemaining=cur.intervalLen;
+      }
+      saveSession(activeTemplateId,cur);
+      renderIntervalTimer(cur);
+    },1000);
+  });
+
+  function logInterval(s){
+    var t=templates.find(function(x){return x.id===activeTemplateId;});
+    s.intervalHistory.push({label:nowLabel(), counts:s.counts.slice()});
+    s.counts=new Array(t.categories.length).fill(0);
+    renderCounterList(t,s); renderTotal(s); renderHistory(s);
+  }
+
+  document.getElementById("intervallog").addEventListener("click",function(){
+    var s=getSession(activeTemplateId);
+    logInterval(s);
+    saveSession(activeTemplateId,s);
+  });
+
+  function renderHistory(s){
+    var wrap=document.getElementById("historywrap");
+    var t=templates.find(function(x){return x.id===activeTemplateId;});
+    if(!s.intervalHistory || s.intervalHistory.length===0){ wrap.innerHTML=""; return; }
+    var html='<table class="historytable"><thead><tr><th>Time</th>';
+    t.categories.forEach(function(c){ html+="<th>"+escapeHtml(c)+"</th>"; });
+    html+="</tr></thead><tbody>";
+    s.intervalHistory.forEach(function(h){
+      html+="<tr><td>"+h.label+"</td>";
+      h.counts.forEach(function(c){ html+="<td>"+c+"</td>"; });
+      html+="</tr>";
+    });
+    html+="</tbody></table>";
+    wrap.innerHTML=html;
+  }
+
+  function download(filename,content){
+    var blob=new Blob([content],{type:"text/csv;charset=utf-8;"});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement("a"); a.href=url; a.download=filename; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  document.getElementById("exportraw").addEventListener("click",function(){
+    var t=templates.find(function(x){return x.id===activeTemplateId;});
+    var s=getSession(activeTemplateId);
+    var meta=["survey,"+t.name,"surveyor,"+(t.surveyorName||""),
+      "location,"+(s.location?(s.location.lat+" "+s.location.lng):""),"weather,"+(s.weather||""),""];
+    var rows=["time,counter,change"];
+    s.rawLog.forEach(function(r){ rows.push(r.t+","+t.categories[r.idx]+","+(r.delta>0?"+1":"-1")); });
+    download(t.name.replace(/\s+/g,"_")+"_raw_log.csv", meta.concat(rows).join("\n"));
+  });
+
+  document.getElementById("exportsummary").addEventListener("click",function(){
+    var t=templates.find(function(x){return x.id===activeTemplateId;});
+    var s=getSession(activeTemplateId);
+    var meta=["survey,"+t.name,"surveyor,"+(t.surveyorName||""),
+      "location,"+(s.location?(s.location.lat+" "+s.location.lng):""),"weather,"+(s.weather||""),""];
+    var rows=["interval end time,"+t.categories.join(",")+",total"];
+    s.intervalHistory.forEach(function(h){
+      var total=h.counts.reduce(function(a,b){return a+b;},0);
+      rows.push(h.label+","+h.counts.join(",")+","+total);
+    });
+    download(t.name.replace(/\s+/g,"_")+"_interval_summary.csv", meta.concat(rows).join("\n"));
+  });
+
+  function tickClock(){
+    var zone=document.getElementById("zoneselect").value;
+    localStorage.setItem(ZONE_KEY,zone);
+    var opts={hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false};
+    if(zone!=="local"){ opts.timeZone=zone; }
+    document.getElementById("clock").textContent=new Intl.DateTimeFormat("en-GB",opts).format(new Date());
+  }
+  function tickSiteClock(){
+    document.getElementById("siteclock").textContent=new Intl.DateTimeFormat("en-GB",{
+      timeZone:"Asia/Bangkok",hour:"2-digit",minute:"2-digit",second:"2-digit",hour12:false
+    }).format(new Date());
+  }
+  document.getElementById("zoneselect").addEventListener("change",tickClock);
+  setInterval(tickClock,1000);
+  setInterval(tickSiteClock,1000);
+
+  document.addEventListener("visibilitychange",function(){
+    if(document.visibilityState==="visible" && !document.getElementById("view-counter").classList.contains("hidden")){
+      requestWakeLock();
+    }
+  });
+
+  renderPresetGrid();
+  renderList();
+  tickClock();
+  tickSiteClock();
+})();
+</script>
+<!-- ==== END TOOL ==== -->
+</div>
+
+<section class="toolssection" id="tools">
+  <h2 class="sectiontitle">เครื่องมือต่างๆ</h2>
+  <p class="sectionsub">ฟรีทุกเครื่องมือ ใช้งานผ่านเบราว์เซอร์ ไม่ต้องติดตั้งแอป</p>
+  <div class="toolgrid">
+    <div class="toolcard active">
+      <div class="ticon">▦</div>
+      <h3>Tally Counter</h3>
+      <p>ออกแบบชุดตัวนับเองได้ พร้อมนาฬิกาซิงค์เขตเวลา แบ่งช่วงเวลาอัตโนมัติ และ export CSV</p>
+      <a class="taglink" href="#home">กำลังใช้งานอยู่</a>
+    </div>
+    <div class="toolcard soon">
+      <div class="ticon">▤</div>
+      <h3>Turning Movement Count</h3>
+      <p>นับแยกทิศทาง/turning movement ต่อแยก สำหรับงานสำรวจจราจรที่ซับซ้อนขึ้น</p>
+      <a class="taglink" href="#contact">เร็วๆ นี้</a>
+    </div>
+    <div class="toolcard soon">
+      <div class="ticon">▥</div>
+      <h3>PHF & Report Export</h3>
+      <p>คำนวณ Peak Hour Factor อัตโนมัติ พร้อม export รายงานสรุปกราฟให้แนบงานได้เลย</p>
+      <a class="taglink" href="#contact">เร็วๆ นี้</a>
+    </div>
+  </div>
+</section>
+
+<section class="contactsection" id="contact">
+  <h2 class="sectiontitle">ติดต่อเรา</h2>
+  <p>มีข้อเสนอแนะ พบปัญหาการใช้งาน หรืออยากให้เพิ่มเครื่องมือแบบไหน<br>
+     ติดต่อมาที่ <a href="mailto:poramat.0hm1@gmail.com">poramat.0hm1@gmail.com</a></p>
+</section>
+
+<footer class="sitefoot">© 2026 TallyField — Built for field surveyors, by a field surveyor.</footer>
+
+</body>
+</html>
