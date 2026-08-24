@@ -1,7 +1,10 @@
-const CACHE_NAME = "tallyfield-v2";
+const CACHE_NAME = "tallyfield-v7";
 const FILES_TO_CACHE = [
   "./index.html",
   "./manifest.json",
+  "./traffic-tools.css",
+  "./traffic-tools.js",
+  "./ui-shell.js",
   "./icon-192.png",
   "./icon-512.png"
 ];

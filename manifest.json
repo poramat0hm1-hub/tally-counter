@@ -1,7 +1,7 @@
 {
-  "name": "Tally Counter — Field Survey Tool",
-  "short_name": "Tally Counter",
-  "description": "Build custom survey counters, count with big field-friendly buttons, sync a world clock, and export CSV data.",
+  "name": "TallyField — Traffic Survey Tools",
+  "short_name": "TallyField",
+  "description": "Field tools for traffic counts, turning movements, pedestrians, queues, spot speed, and parking surveys.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",

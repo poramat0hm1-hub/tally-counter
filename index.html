@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>TallyField — Free Field Survey Counter</title>
 <link rel="manifest" href="manifest.json" />
+<link rel="stylesheet" href="traffic-tools.css" />
 <meta name="theme-color" content="#17181A" />
 <style>
   :root{
@@ -28,6 +29,8 @@
   nav.sitenav a{color:var(--muted); text-decoration:none; font-size:13px; font-weight:700; letter-spacing:.02em;
     padding:4px 2px; border-bottom:2px solid transparent;}
   nav.sitenav a:hover{color:var(--text); border-bottom-color:var(--orange);}
+  .headleft,.headright{display:flex;align-items:center;gap:10px}.menubtn{width:38px;height:38px;border:1px solid var(--border);border-radius:8px;background:var(--panel);color:var(--text);font-size:20px;cursor:pointer}.langselect{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:8px;font:12px var(--disp)}
+  .drawerbackdrop{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:80}.drawer{position:fixed;left:0;top:0;bottom:0;width:min(330px,88vw);z-index:90;background:var(--asphalt);border-right:1px solid var(--border);padding:18px;overflow:auto;transform:translateX(-105%);transition:transform .2s}.drawer.open{transform:translateX(0)}.drawerhead{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}.drawerclose{background:var(--panel);border:1px solid var(--border);color:var(--text);border-radius:7px;padding:7px 10px;cursor:pointer}.drawer nav{display:grid;gap:7px}.drawer nav a{display:block;padding:11px 12px;border:1px solid var(--border);border-radius:8px;color:var(--text);text-decoration:none;font-size:13px}.drawer nav a:hover{border-color:var(--orange)}.drawer small{display:block;color:var(--muted);margin:18px 4px 8px}
 
   /* ---------- hero ---------- */
   .hero{max-width:760px; margin:0 auto; padding:56px 20px 30px; text-align:center;}
@@ -45,46 +48,52 @@
   .sectiontitle{font-size:22px; margin:0 0 6px;}
   .sectionsub{color:var(--muted); font-size:13px; margin:0 0 26px;}
   .toolgrid{display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:16px;}
-  .toolcard{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:left;}
+  .toolcard{display:block; background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px; text-align:left; color:var(--text); text-decoration:none;}
   .toolcard.active{border-color:var(--orange);}
   .toolcard .ticon{width:34px; height:34px; border-radius:8px; background:var(--panel-2); display:flex;
     align-items:center; justify-content:center; font-size:17px; margin-bottom:10px;}
   .toolcard.active .ticon{background:var(--orange); color:#1a0c00;}
   .toolcard h3{font-size:15px; margin:0 0 6px;}
   .toolcard p{font-size:12px; color:var(--muted); margin:0 0 12px; line-height:1.5;}
-  .toolcard .taglink{font-size:12px; color:var(--orange); text-decoration:none; font-weight:700;}
-  .toolcard.soon{opacity:.55;}
-  .toolcard.soon .taglink{color:var(--muted);}
+  .toolcard .taglink{font-size:12px; color:var(--orange); text-decoration:none; font-weight:700; background:none; border:0; padding:0; cursor:pointer; font-family:var(--disp);}
+  .toolcard[data-open-tool]{cursor:pointer; transition:border-color .15s,transform .15s;}
+  .toolcard[data-open-tool]:hover{border-color:var(--orange); transform:translateY(-2px);}
 
   /* ---------- contact / footer ---------- */
   .contactsection{max-width:700px; margin:0 auto; padding:40px 20px 20px; border-top:1px solid var(--border); text-align:center;}
   .contactsection p{color:var(--muted); font-size:13px; line-height:1.7;}
   .contactsection a{color:var(--yellow); text-decoration:none;}
   footer.sitefoot{text-align:center; padding:20px; color:var(--muted); font-size:11px; border-top:1px solid var(--border);}
+  .workflowsection{max-width:900px;margin:0 auto;padding:40px 20px 55px;border-top:1px solid var(--border)}
+  .workflowgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:18px}.workflowcard{background:var(--panel);border:1px solid var(--border);border-radius:10px;padding:15px}.workflowcard strong{display:block;color:var(--orange);font-size:12px;margin-bottom:6px}.workflowcard p{color:var(--muted);font-size:12px;line-height:1.65;margin:0}
+  .guidesection{max-width:900px;margin:0 auto;padding:40px 20px 55px;border-top:1px solid var(--border)}.guidegrid{display:grid;gap:8px;margin-top:18px}.guideitem{background:var(--panel);border:1px solid var(--border);border-radius:10px}.guideitem summary{cursor:pointer;padding:14px 16px;font-size:13px;font-weight:700;color:var(--text)}.guidebody{padding:0 16px 16px;color:var(--muted);font-size:12px;line-height:1.65}.guidebody h4{color:var(--orange);font-size:11px;text-transform:uppercase;letter-spacing:.06em;margin:12px 0 4px}.guidebody ol,.guidebody ul{margin:4px 0 8px;padding-left:20px}.guidebody p{margin:4px 0}
+  .professionalnote{background:linear-gradient(145deg,var(--panel),#191a1d);border:1px solid var(--border);border-left:4px solid var(--orange);border-radius:12px;padding:20px;margin:18px 0 24px}.professionalnote h3{margin:3px 0 10px;font-size:19px}.professionalnote>p{color:var(--muted);font-size:12px;line-height:1.7}.professionalnote .eyebrow{color:var(--orange);font:700 10px var(--mono);letter-spacing:.12em}.methodgrid{display:grid;grid-template-columns:1fr 1fr;gap:9px;margin:14px 0}.methodgrid>div{background:rgba(0,0,0,.22);border:1px solid var(--border);border-radius:8px;padding:11px}.methodgrid strong{font-size:11px;color:var(--yellow)}.methodgrid p{font-size:11px;line-height:1.6;color:var(--muted);margin:5px 0 0}.sourcehint{border-top:1px solid var(--border);padding-top:10px;font-size:10px!important}.sourcehint a{color:var(--yellow)}.guidegrid>.guideitem:last-child{display:none}
 
   @media (max-width:520px){
-    nav.sitenav{gap:14px;}
-    nav.sitenav a{font-size:12px;}
+    nav.sitenav{display:none}
     .hero h1{font-size:24px;}
+    .workflowgrid{grid-template-columns:1fr 1fr;}
+    .methodgrid{grid-template-columns:1fr}
   }
 </style>
 </head>
 <body>
 
 <header class="sitehead">
-  <a class="logo" href="#home"><span class="mark">▲</span>TallyField</a>
+  <div class="headleft"><button class="menubtn" id="menu-open" aria-label="เปิดเมนู" aria-expanded="false">☰</button><a class="logo" href="#home"><span class="mark">▲</span>TallyField</a></div>
   <nav class="sitenav">
     <a href="#home">หน้าหลัก</a>
     <a href="#tools">เครื่องมือต่างๆ</a>
+    <a href="#guide">คู่มือ</a>
     <a href="#contact">ติดต่อเรา</a>
-  </nav>
+  </nav><div class="headright"><select id="language-select" class="langselect" aria-label="Language"><option value="th">ไทย</option><option value="en">English</option><option value="zh">中文</option></select></div>
 </header>
+<div class="drawerbackdrop hidden" id="drawer-backdrop"></div><aside class="drawer" id="site-drawer" aria-hidden="true"><div class="drawerhead"><strong>TallyField Menu</strong><button class="drawerclose" id="menu-close">ปิด ×</button></div><nav><a href="#home" data-navlabel="home">หน้าหลัก</a><a href="#tools" data-navlabel="tools">เครื่องมือทั้งหมด</a><a href="index.html?tool=tally#tool-embed">Tally Counter</a><a href="index.html?tool=turning#traffic-lab">Turning Movement</a><a href="index.html?tool=active#traffic-lab">Pedestrian & Bicycle</a><a href="index.html?tool=queue#traffic-lab">Queue & Delay</a><a href="index.html?tool=speed#traffic-lab">Spot Speed</a><a href="index.html?tool=parking#traffic-lab">Parking Survey</a><a href="index.html?tool=custom#traffic-lab" data-navlabel="custom">สร้างแบบสำรวจเอง / OD Survey</a><a href="#guide" data-navlabel="guide">คู่มือ</a><a href="#contact" data-navlabel="contact">ติดต่อเรา</a></nav><small>ลิงก์ทุกหน้าสามารถคลิกขวาเพื่อเปิดแท็บใหม่ได้</small></aside>
 
 <section class="hero" id="home">
-  <p class="eyebrow">Free field survey tool</p>
-  <h1>นับข้อมูลภาคสนามให้แม่นยำ<br>ไม่ต้องพกกระดาษอีกต่อไป</h1>
-  <p>เครื่องมือนับจราจร/สำรวจแบบออกแบบเองได้ ใช้งานฟรี ไม่ต้องติดตั้งแอป
-     เปิดผ่านเบราว์เซอร์บนมือถือได้ทันที พร้อมนาฬิกาซิงค์เวลา และ export ข้อมูลเป็น CSV</p>
+  <p class="eyebrow">เครื่องมือสำรวจภาคสนาม</p>
+  <h1>TallyField</h1>
+  <p>เว็บนับข้อมูลสำหรับงานสำรวจจราจร สร้างชุดตัวนับเอง ซิงก์เวลา บันทึกตำแหน่ง และส่งออกข้อมูลเป็น CSV</p>
   <a class="herobtn" href="#tool-embed">เริ่มใช้งานเลย ↓</a>
 </section>
 
@@ -92,7 +101,7 @@
 <!-- ==== TALLY COUNTER TOOL (unchanged app logic below) ==== -->
 <style>
   .tc{background:var(--asphalt); color:var(--text); font-family:var(--disp);
-    border-radius:16px; padding:20px; max-width:520px; margin:0 auto; min-height:420px; position:relative;
+    border-radius:16px; padding:24px; max-width:760px; margin:0 auto; min-height:560px; position:relative;
     border:1px solid var(--border);}
   .eyebrow2{font-size:11px; letter-spacing:.14em; text-transform:uppercase; color:var(--orange); margin:0 0 2px;}
   .titlerow{display:flex; align-items:center; justify-content:space-between; margin-bottom:14px; gap:10px;}
@@ -172,6 +181,7 @@
   .hidden{display:none;}
   .modalbg{position:fixed; inset:0; background:rgba(0,0,0,.55); display:flex; align-items:center; justify-content:center;
     z-index:50;}
+  .modalbg.hidden{display:none;}
   .modalbox{background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:18px; width:80%; max-width:340px;}
   .modaltext{font-size:13px; margin:0 0 14px; line-height:1.4;}
   .modalbtns{display:flex; gap:8px;}
@@ -185,6 +195,11 @@
     </div>
     <div id="surveylist"></div>
     <button class="primary" id="newsurveybtn">+ New survey</button>
+    <div class="btnrow" style="margin-top:8px;">
+      <button class="secondary" id="backupbtn">Export backup</button>
+      <button class="secondary" id="restorebtn">Restore backup</button>
+      <input type="file" id="restorefile" accept=".json,application/json" class="hidden" />
+    </div>
   </div>
 
   <div id="view-builder" class="hidden">
@@ -303,6 +318,7 @@
   var TEMPLATES_KEY="survey_templates_v2";
   var SESSION_KEY_PREFIX="survey_session_v2_";
   var ZONE_KEY="tc_zone_pref";
+  var LAB_KEY="tallyfield_traffic_lab_v1";
 
   var PRESETS=["Motorcycle","Car (sedan)","Pickup","Truck 2-6 wheels","Large truck (>6 wheels)","Bus","Bicycle","Pedestrian"];
 
@@ -477,7 +493,7 @@
 
   function newSession(catCount){
     return { counts:new Array(catCount).fill(0), rawLog:[], intervalHistory:[], location:null, weather:"",
-      intervalLen:900, intervalRemaining:900, intervalRunning:false };
+      intervalLen:900, intervalRemaining:900, intervalRunning:false, undoFloor:0 };
   }
 
   function nowLabel(){
@@ -582,7 +598,7 @@
 
   document.getElementById("undobtn").addEventListener("click",function(){
     var s=getSession(activeTemplateId);
-    if(s.rawLog.length===0) return;
+    if(s.rawLog.length<=(s.undoFloor||0)) return;
     var last=s.rawLog.pop();
     s.counts[last.idx]-=last.delta;
     if(s.counts[last.idx]<0) s.counts[last.idx]=0;
@@ -597,6 +613,7 @@
       var t=templates.find(function(x){return x.id===activeTemplateId;});
       var s=getSession(activeTemplateId);
       s.counts=new Array(t.categories.length).fill(0);
+      s.undoFloor=s.rawLog.length;
       saveSession(activeTemplateId,s);
       renderCounterList(t,s); renderTotal(s);
     });
@@ -672,13 +689,16 @@
     var t=templates.find(function(x){return x.id===activeTemplateId;});
     s.intervalHistory.push({label:nowLabel(), counts:s.counts.slice()});
     s.counts=new Array(t.categories.length).fill(0);
+    s.undoFloor=s.rawLog.length;
     renderCounterList(t,s); renderTotal(s); renderHistory(s);
   }
 
   document.getElementById("intervallog").addEventListener("click",function(){
-    var s=getSession(activeTemplateId);
-    logInterval(s);
-    saveSession(activeTemplateId,s);
+    askConfirm("Log this interval and reset the current counts?",function(){
+      var s=getSession(activeTemplateId);
+      logInterval(s);
+      saveSession(activeTemplateId,s);
+    });
   });
 
   function renderHistory(s){
@@ -697,34 +717,85 @@
     wrap.innerHTML=html;
   }
 
-  function download(filename,content){
-    var blob=new Blob([content],{type:"text/csv;charset=utf-8;"});
+  function download(filename,content,mime){
+    var blob=new Blob([content],{type:mime||"text/csv;charset=utf-8;"});
     var url=URL.createObjectURL(blob);
     var a=document.createElement("a"); a.href=url; a.download=filename; a.click();
     URL.revokeObjectURL(url);
   }
 
+  function csvCell(value){
+    var text=String(value==null?"":value);
+    return /[",\r\n]/.test(text) ? '"'+text.replace(/"/g,'""')+'"' : text;
+  }
+
   document.getElementById("exportraw").addEventListener("click",function(){
     var t=templates.find(function(x){return x.id===activeTemplateId;});
     var s=getSession(activeTemplateId);
-    var meta=["survey,"+t.name,"surveyor,"+(t.surveyorName||""),
-      "location,"+(s.location?(s.location.lat+" "+s.location.lng):""),"weather,"+(s.weather||""),""];
+    var meta=["survey,"+csvCell(t.name),"surveyor,"+csvCell(t.surveyorName||""),
+      "created_at,"+csvCell(t.createdAt||""),"exported_at,"+csvCell(new Date().toISOString()),
+      "location,"+csvCell(s.location?(s.location.lat+" "+s.location.lng):""),"weather,"+csvCell(s.weather||""),""];
     var rows=["time,counter,change"];
-    s.rawLog.forEach(function(r){ rows.push(r.t+","+t.categories[r.idx]+","+(r.delta>0?"+1":"-1")); });
+    s.rawLog.forEach(function(r){ rows.push(csvCell(r.t)+","+csvCell(t.categories[r.idx])+","+(r.delta>0?"+1":"-1")); });
     download(t.name.replace(/\s+/g,"_")+"_raw_log.csv", meta.concat(rows).join("\n"));
   });
 
   document.getElementById("exportsummary").addEventListener("click",function(){
     var t=templates.find(function(x){return x.id===activeTemplateId;});
     var s=getSession(activeTemplateId);
-    var meta=["survey,"+t.name,"surveyor,"+(t.surveyorName||""),
-      "location,"+(s.location?(s.location.lat+" "+s.location.lng):""),"weather,"+(s.weather||""),""];
-    var rows=["interval end time,"+t.categories.join(",")+",total"];
+    var meta=["survey,"+csvCell(t.name),"surveyor,"+csvCell(t.surveyorName||""),
+      "created_at,"+csvCell(t.createdAt||""),"exported_at,"+csvCell(new Date().toISOString()),
+      "location,"+csvCell(s.location?(s.location.lat+" "+s.location.lng):""),"weather,"+csvCell(s.weather||""),""];
+    var rows=["interval end time,"+t.categories.map(csvCell).join(",")+",total"];
     s.intervalHistory.forEach(function(h){
       var total=h.counts.reduce(function(a,b){return a+b;},0);
-      rows.push(h.label+","+h.counts.join(",")+","+total);
+      rows.push(csvCell(h.label)+","+h.counts.join(",")+","+total);
     });
     download(t.name.replace(/\s+/g,"_")+"_interval_summary.csv", meta.concat(rows).join("\n"));
+  });
+
+  document.getElementById("backupbtn").addEventListener("click",function(){
+    var sessions={};
+    templates.forEach(function(t){ sessions[t.id]=getSession(t.id); });
+    var labData=null;
+    try{ labData=JSON.parse(localStorage.getItem(LAB_KEY)||"null"); }catch(e){}
+    var backup={format:"tallyfield-backup-v1",exportedAt:new Date().toISOString(),timezone:localStorage.getItem(ZONE_KEY)||"Asia/Bangkok",templates:templates,sessions:sessions,trafficLab:labData};
+    download("tallyfield_backup_"+new Date().toISOString().slice(0,10)+".json",JSON.stringify(backup,null,2),"application/json;charset=utf-8;");
+  });
+
+  document.getElementById("restorebtn").addEventListener("click",function(){
+    document.getElementById("restorefile").click();
+  });
+
+  document.getElementById("restorefile").addEventListener("change",function(){
+    var input=this, file=input.files&&input.files[0];
+    if(!file) return;
+    var reader=new FileReader();
+    reader.onload=function(){
+      try{
+        var backup=JSON.parse(reader.result);
+        if(backup.format!=="tallyfield-backup-v1" || !Array.isArray(backup.templates) || !backup.sessions){ throw new Error("invalid"); }
+        backup.templates.forEach(function(t){
+          if(!Number.isFinite(t.id) || !t.name || !Array.isArray(t.categories) || t.categories.length===0){ throw new Error("invalid"); }
+          var session=backup.sessions[t.id];
+          if(session && (!Array.isArray(session.counts) || session.counts.length!==t.categories.length)){ throw new Error("invalid"); }
+        });
+        askConfirm("Restore this backup? It will replace all surveys on this device.",function(){
+          var keys=[];
+          for(var i=0;i<localStorage.length;i++){ var key=localStorage.key(i); if(key.indexOf(SESSION_KEY_PREFIX)===0) keys.push(key); }
+          keys.forEach(function(key){ localStorage.removeItem(key); });
+          templates=backup.templates;
+          saveTemplates();
+          templates.forEach(function(t){ if(backup.sessions[t.id]) saveSession(t.id,backup.sessions[t.id]); });
+          if(backup.timezone) localStorage.setItem(ZONE_KEY,backup.timezone);
+          if(backup.trafficLab) localStorage.setItem(LAB_KEY,JSON.stringify(backup.trafficLab));
+          nextTid=Math.max.apply(null,templates.map(function(t){return t.id;}).concat([0]))+1;
+          window.location.reload();
+        });
+      }catch(e){ alert("This backup file is not valid or is damaged."); }
+      input.value="";
+    };
+    reader.readAsText(file);
   });
 
   function tickClock(){
@@ -755,31 +826,85 @@
   <h2 class="sectiontitle">เครื่องมือต่างๆ</h2>
   <p class="sectionsub">ฟรีทุกเครื่องมือ ใช้งานผ่านเบราว์เซอร์ ไม่ต้องติดตั้งแอป</p>
   <div class="toolgrid">
-    <div class="toolcard active">
+    <a class="toolcard active" data-open-tool="tally" href="index.html?tool=tally#tool-embed">
       <div class="ticon">▦</div>
       <h3>Tally Counter</h3>
       <p>ออกแบบชุดตัวนับเองได้ พร้อมนาฬิกาซิงค์เขตเวลา แบ่งช่วงเวลาอัตโนมัติ และ export CSV</p>
-      <a class="taglink" href="#home">กำลังใช้งานอยู่</a>
-    </div>
-    <div class="toolcard soon">
+      <span class="taglink">เปิดเครื่องมือ</span>
+    </a>
+    <a class="toolcard" data-open-tool="turning" href="index.html?tool=turning#traffic-lab">
       <div class="ticon">▤</div>
       <h3>Turning Movement Count</h3>
       <p>นับแยกทิศทาง/turning movement ต่อแยก สำหรับงานสำรวจจราจรที่ซับซ้อนขึ้น</p>
-      <a class="taglink" href="#contact">เร็วๆ นี้</a>
-    </div>
-    <div class="toolcard soon">
-      <div class="ticon">▥</div>
-      <h3>PHF & Report Export</h3>
-      <p>คำนวณ Peak Hour Factor อัตโนมัติ พร้อม export รายงานสรุปกราฟให้แนบงานได้เลย</p>
-      <a class="taglink" href="#contact">เร็วๆ นี้</a>
-    </div>
+      <span class="taglink">เปิดเครื่องมือ</span>
+    </a>
+    <a class="toolcard" data-open-tool="active" href="index.html?tool=active#traffic-lab">
+      <div class="ticon">♿</div>
+      <h3>Pedestrian & Bicycle</h3>
+      <p>นับคนเดินเท้า จักรยาน และไมโครโมบิลิตี้แยกตามทิศทางหรือทางข้าม</p>
+      <span class="taglink">เปิดเครื่องมือ</span>
+    </a>
+    <a class="toolcard" data-open-tool="queue" href="index.html?tool=queue#traffic-lab">
+      <div class="ticon">≋</div>
+      <h3>Queue & Delay</h3>
+      <p>บันทึกจำนวนรถในคิว สถานะสัญญาณ และเหตุการณ์ในแต่ละรอบสังเกต</p>
+      <span class="taglink">เปิดเครื่องมือ</span>
+    </a>
+    <a class="toolcard" data-open-tool="speed" href="index.html?tool=speed#traffic-lab">
+      <div class="ticon">⌁</div>
+      <h3>Spot Speed</h3>
+      <p>จับเวลารถผ่านระยะที่กำหนดและสรุปความเร็วเฉลี่ยกับเปอร์เซ็นไทล์ที่ 85</p>
+      <span class="taglink">เปิดเครื่องมือ</span>
+    </a>
+    <a class="toolcard" data-open-tool="parking" href="index.html?tool=parking#traffic-lab">
+      <div class="ticon">P</div>
+      <h3>Parking Survey</h3>
+      <p>บันทึกรถเข้า–ออก ปริมาณรถสะสม และอัตราการครอบครองพื้นที่จอด</p>
+      <span class="taglink">เปิดเครื่องมือ</span>
+    </a>
+    <a class="toolcard" data-open-tool="custom" href="index.html?tool=custom#traffic-lab">
+      <div class="ticon">✎</div><h3>Custom Survey / OD</h3><p>อัปโหลดผังอ้างอิง กำหนดต้นทาง–ปลายทางหรือหมวดนับเอง แล้วเก็บข้อมูลผ่านเว็บ</p><span class="taglink">เปิดเครื่องมือ</span>
+    </a>
+  </div>
+</section>
+
+<section class="trafficlab" id="traffic-lab">
+  <h2>Traffic Survey Lab</h2>
+  <p class="trafficlab-intro">เครื่องมือเก็บข้อมูลจราจรภาคสนามรุ่นทดลอง ข้อมูลบันทึกอยู่ในอุปกรณ์นี้และส่งออกเป็น CSV ได้ ควรทดลอง workflow ก่อนนำไปใช้เก็บข้อมูลจริง</p>
+  <div id="traffic-lab-app"></div>
+</section>
+
+<section class="workflowsection" id="workflow">
+  <h2 class="sectiontitle">จากภาคสนามถึงไฟล์ข้อมูล</h2>
+  <p class="sectionsub">ออกแบบให้ทุกงานสำรวจเดินตามขั้นตอนเดียวกันและตรวจสอบได้</p>
+  <div class="workflowgrid">
+    <div class="workflowcard"><strong>1 · เตรียมงาน</strong><p>กำหนดโครงการ จุดสำรวจ ผู้สำรวจ เวลา และประเภทข้อมูลก่อนเริ่ม</p></div>
+    <div class="workflowcard"><strong>2 · เก็บข้อมูล</strong><p>ใช้ปุ่มที่เหมาะกับงาน พร้อมเวลาและประวัติ observation ทุกครั้ง</p></div>
+    <div class="workflowcard"><strong>3 · ตรวจคุณภาพ</strong><p>ตรวจ metadata ค่าผิดปกติ ช่วงข้อมูลว่าง และเหตุการณ์พิเศษ</p></div>
+    <div class="workflowcard"><strong>4 · ส่งออก</strong><p>สำรองข้อมูลและส่งออก CSV เพื่อนำไปวิเคราะห์หรือทำรายงานต่อ</p></div>
+  </div>
+</section>
+
+<section class="guidesection" id="guide">
+  <h2 class="sectiontitle">คู่มือการใช้เครื่องมือ</h2>
+  <p class="sectionsub">เลือกหัวข้อเพื่อดูสิ่งที่ต้องเตรียม วิธีเก็บข้อมูล ผลลัพธ์ และข้อควรระวัง</p>
+  <article class="professionalnote"><p class="eyebrow">FIELD METHOD NOTE · ORIGIN–DESTINATION</p><h3>หลักการออกแบบงานสำรวจ OD ที่ใช้ตัดสินใจได้</h3><p><strong>เริ่มจากคำถามวิเคราะห์ ไม่ใช่เริ่มจากแบบฟอร์ม:</strong> ระบุว่าจะใช้ข้อมูลเพื่อวิเคราะห์เส้นทางหลัก การกระจายการเดินทาง การเข้า–ออกพื้นที่ ผลกระทบโครงการ หรือสร้าง trip table สำหรับแบบจำลอง เพราะแต่ละวัตถุประสงค์ต้องการขอบเขต zone ความละเอียด และวิธีสุ่มต่างกัน</p><div class="methodgrid"><div><strong>1 · กำหนดระบบโซน</strong><p>ตั้งรหัสที่ไม่ซ้ำ ขอบเขตไม่ทับซ้อน และรวมพื้นที่ที่มีลักษณะการเดินทางใกล้เคียงกัน โซนที่ละเอียดเกินไปทำให้ matrix กระจัดกระจายและต้องการตัวอย่างมากขึ้น</p></div><div><strong>2 · เลือกวิธีสำรวจ</strong><p>Cordon observation เหมาะกับการเข้า–ออกพื้นที่; intercept/roadside interview เก็บ purpose และ mode ได้; coded matching ใช้ติดตามจุดเข้า–ออกแต่ต้องมีมาตรการความเป็นส่วนตัว</p></div><div><strong>3 · ออกแบบตัวอย่าง</strong><p>กำหนดวัน ช่วงเวลา ทิศทาง จุดสำรวจ และเกณฑ์คัดเลือกก่อนลงสนาม บันทึกจำนวนผู้ปฏิเสธหรือข้อมูลไม่สมบูรณ์เมื่อเป็นงานสัมภาษณ์</p></div><div><strong>4 · ตรวจคุณภาพ</strong><p>ตรวจ zone ที่ไม่รู้จัก เที่ยวซ้ำ ค่า weight ผิดปกติ ข้อมูลขาด และเปรียบเทียบผลรวมกับ traffic count อิสระก่อนขยายผล</p></div></div><p><strong>ผลลัพธ์ที่ควรส่งมอบ:</strong> raw trip records, zone definition, sampling/method note, observed OD matrix, weighted matrix (ถ้ามีฐานขยายผลที่ตรวจสอบแล้ว) และข้อจำกัดของข้อมูล ไม่ควรเรียก observed count ว่าเป็น demand ทั้งหมดโดยไม่มี sampling frame และ expansion factor ที่เหมาะสม</p><p class="sourcehint">เรียบเรียงตามหลัก OD matrix และ field-study guidance ของ FHWA และ matrix-building guidance ของ UK Department for Transport</p></article>
+  <p class="sourcehint">เอกสารอ้างอิง: <a href="https://ops-dr.fhwa.dot.gov/publications/fhwahop12009/sec4.htm" target="_blank" rel="noopener">FHWA Traffic Analysis Toolbox</a> · <a href="https://www.gov.uk/government/publications/matrix-building-for-transport-analysis-technical-report" target="_blank" rel="noopener">UK DfT Matrix Building Guidance</a> · <a href="https://www.fhwa.dot.gov/policyinformation/pubs/traffic-data-applications-highlights/what-traffic-data-are.cfm" target="_blank" rel="noopener">FHWA Traffic Data Applications</a></p>
+  <div class="guidegrid">
+    <details class="guideitem"><summary>Tally Counter — นับปริมาณจราจรแยกประเภท</summary><div class="guidebody"><h4>ใช้ทำไม</h4><p>ใช้วัดปริมาณรถที่ผ่านจุดหรือช่วงถนน แยกตามประเภทยานพาหนะ เหมาะกับงานเรียน งานสำรวจช่วงสั้น การตรวจสอบเครื่องนับ และการเปรียบเทียบก่อน–หลังโครงการ</p><h4>ข้อมูลที่เก็บ</h4><p>เวลา ประเภทรถ การแก้ยอด ช่วงเวลานับ ผู้สำรวจ จุดสำรวจ พิกัด สภาพอากาศ และเหตุการณ์ผิดปกติ</p><h4>เตรียมงาน</h4><p>กำหนดเส้นนับ ทิศทาง ช่องจราจร ประเภทรถ และรอบเวลาให้ทั้งทีมเข้าใจตรงกัน</p><h4>วิธีใช้</h4><ol><li>สร้างชุดตัวนับหรือเลือกหมวดรถมาตรฐาน</li><li>กำหนดช่วงเวลา 5/15/30/60 นาที</li><li>กด + เมื่อรถผ่านเส้นนับ ใช้ Undo เฉพาะการกดล่าสุด</li><li>กด Log now เมื่อจบช่วง หรือใช้ช่วงอัตโนมัติ</li><li>ส่งออก raw log และ interval CSV พร้อมสำรอง JSON</li></ol><h4>นำไปทำอะไรต่อ</h4><ul><li>กราฟปริมาณรถรายช่วงเวลาและช่วงพีค</li><li>สัดส่วนประเภทรถและการเปรียบเทียบแต่ละทิศทาง</li><li>ข้อมูลประกอบงานออกแบบถนน ทางแยก หรือผลกระทบโครงการ</li></ul><h4>ข้อควรระวัง</h4><p>ยืนในตำแหน่งปลอดภัยที่เห็นช่องจราจรครบ ใช้นิยามประเภทรถเดียวกัน และระบุช่วงฝนตก อุบัติเหตุ งานก่อสร้าง หรือข้อมูลขาด</p></div></details>
+    <details class="guideitem"><summary>Turning Movement Count — สำรวจการเลี้ยวที่ทางแยก</summary><div class="guidebody"><h4>ใช้ทำไม</h4><p>ใช้ดูว่ารถจากแต่ละขาเข้ากระจายไปซ้าย ตรง ขวา หรือ U-turn เท่าใด เหมาะกับการวิเคราะห์ทางแยก การจัดช่องจราจร การตั้งเวลาสัญญาณ และทางเข้า–ออกโครงการ</p><h4>ข้อมูลที่เก็บ</h4><p>เวลา ขาเข้า movement และประเภทยานพาหนะของแต่ละ observation</p><h4>เตรียมงาน</h4><p>วาดผัง กำหนดทิศเหนือ ตั้งชื่อ approach และตกลงว่าการเคลื่อนที่ใดนับเป็น Left/Through/Right/U-turn</p><h4>วิธีใช้</h4><ol><li>เลือก approach และประเภทรถ</li><li>กดปุ่ม movement เมื่อรถผ่านจุดขัดแย้งหรือเส้นอ้างอิง</li><li>เปลี่ยน approach เมื่อรับผิดชอบอีกขาเข้า</li><li>ตรวจยอดรวมและส่งออก CSV หลังจบงาน</li></ol><h4>นำไปทำอะไรต่อ</h4><ul><li>สร้าง turning movement matrix และแผนภาพลูกศร</li><li>หาสัดส่วนการเลี้ยวและปริมาณเข้าทางแยก</li><li>ใช้ร่วมกับช่องจราจรและสัญญาณเพื่อวิเคราะห์การทำงานของทางแยก</li></ul><h4>ข้อควรระวัง</h4><p>ชื่อทิศทางต้องตรงกันทั้งทีม ทางแยกปริมาณสูงควรแบ่งผู้สำรวจตามขาเข้า และควรตรวจทานกับวิดีโอหรือผู้สังเกตอีกคนเมื่อทำได้</p></div></details>
+    <details class="guideitem"><summary>Pedestrian & Bicycle — คนเดินเท้าและจักรยาน</summary><div class="guidebody"><h4>ใช้ทำไม</h4><p>ใช้วัดความต้องการเดิน จักรยาน และไมโครโมบิลิตี้บริเวณทางข้าม ทางเท้า สถานี โรงเรียน หรือทางแยก เพื่อให้การวิเคราะห์ไม่มองเฉพาะรถยนต์</p><h4>ข้อมูลที่เก็บ</h4><p>เวลา ประเภทผู้ใช้ทาง และทิศทางหรือทางข้ามที่ใช้</p><h4>เตรียมงาน</h4><p>กำหนดเส้นนับ ชื่อ crossing และเกณฑ์ว่าจะนับตอนเริ่มข้ามหรือข้ามสำเร็จ</p><h4>วิธีใช้</h4><ol><li>เลือก Direction/Crossing</li><li>กดประเภทผู้ใช้ทุกครั้งที่ผ่านเส้นอ้างอิง</li><li>ใช้เกณฑ์เดิมตลอดช่วงและบันทึกสิ่งกีดขวางหรือเหตุการณ์</li></ol><h4>นำไปทำอะไรต่อ</h4><ul><li>หาปริมาณผู้ใช้รายช่วงเวลาและทิศทางหลัก</li><li>ประเมินความต้องการทางข้าม ทางจักรยาน หรือช่วงสัญญาณคนเดินเท้า</li><li>เปรียบเทียบก่อน–หลังการปรับปรุงพื้นที่</li></ul><h4>ข้อควรระวัง</h4><p>อย่านับคนเดิมซ้ำเมื่อหยุดหรือวนกลับ และห้ามเปลี่ยนเส้นนับหรือเกณฑ์กลางงานโดยไม่ทำหมายเหตุ</p></div></details>
+    <details class="guideitem"><summary>Queue & Delay — ความยาวคิวและความล่าช้า</summary><div class="guidebody"><h4>ใช้ทำไม</h4><p>ใช้ติดตามการก่อตัวและสลายตัวของคิวที่ทางแยก ทางเข้าโครงการ ด่าน หรือคอขวด และตรวจว่าคิวล้นช่องเก็บรถหรือกระทบพื้นที่ข้างเคียงหรือไม่</p><h4>ข้อมูลที่เก็บ</h4><p>เวลา ขาเข้า จำนวนรถในคิว สถานะสัญญาณ และเหตุการณ์ในแต่ละรอบสังเกต</p><h4>เตรียมงาน</h4><p>กำหนด approach จุดท้ายคิว นิยามรถในคิว และรอบสังเกตคงที่ เช่น 15 หรือ 30 วินาที</p><h4>วิธีใช้</h4><ol><li>เลือก approach และสถานะสัญญาณ</li><li>กรอกจำนวนรถในคิว ณ เวลาที่กำหนด</li><li>บันทึกคิวล้น รถจอดกีดขวาง หรือเหตุการณ์ผิดปกติ</li></ol><h4>นำไปทำอะไรต่อ</h4><ul><li>หาคิวเฉลี่ย คิวสูงสุด และช่วงที่คิวไม่สลาย</li><li>เทียบคิวกับความยาวช่องเก็บรถหรือระยะถึงทางแยกถัดไป</li><li>ใช้ประกอบการปรับสัญญาณ ช่องเลี้ยว หรือทางเข้าออก</li></ul><h4>ข้อควรระวัง</h4><p>แยกคิวหยุดจากรถชะลอตัว ใช้รอบสังเกตเดิม และระบุเมื่อมองไม่เห็นท้ายคิวจริง</p></div></details>
+    <details class="guideitem"><summary>Spot Speed — สำรวจความเร็วเฉพาะจุด</summary><div class="guidebody"><h4>ใช้ทำไม</h4><p>ใช้ศึกษาการกระจายความเร็ว ณ ตำแหน่งหนึ่ง เปรียบเทียบรถแต่ละประเภท หรือประเมินก่อน–หลังมาตรการชะลอความเร็วแบบเบื้องต้น</p><h4>ข้อมูลที่เก็บ</h4><p>เวลา ประเภทรถ ทิศทาง ระยะทาง เวลาที่ใช้ และความเร็วรายคัน</p><h4>เตรียมงาน</h4><p>วัดระยะระหว่างจุดเริ่ม–สิ้นสุดให้ถูกต้อง เลือกจุดปลอดภัย และกำหนดวิธีสุ่มรถ</p><h4>วิธีใช้</h4><ol><li>กรอกระยะเป็นเมตร เลือกประเภทรถและทิศทาง</li><li>กด Start เมื่อรถผ่านจุดแรก</li><li>กด Stop & record เมื่อรถคันเดิมผ่านจุดที่สอง</li><li>เก็บตัวอย่างต่อเนื่องโดยไม่เลือกเฉพาะรถเร็ว</li></ol><h4>นำไปทำอะไรต่อ</h4><ul><li>หาความเร็วเฉลี่ย มัธยฐาน และเปอร์เซ็นไทล์ที่ 85</li><li>สร้าง speed distribution และสัดส่วนรถเกินค่าที่กำหนด</li><li>เปรียบเทียบตามทิศทาง ประเภทรถ หรือช่วงเวลา</li></ul><h4>ข้อควรระวัง</h4><p>ผลขึ้นกับระยะและ reaction time ของผู้กด ไม่เหมาะกับระยะสั้นมาก และไม่ใช้เพื่อการบังคับใช้กฎหมาย</p></div></details>
+    <details class="guideitem"><summary>Parking Survey — การใช้พื้นที่จอดรถ</summary><div class="guidebody"><h4>ใช้ทำไม</h4><p>ใช้ตรวจ supply, ช่วงความต้องการสูง รถหมุนเวียนเร็วหรือช้า และการจอดผิดพื้นที่ เหมาะกับลานจอด อาคาร สถานี มหาวิทยาลัย ร้านค้า และ parking stress survey</p><h4>เลือกวิธีสำรวจ</h4><ul><li><strong>Inventory snapshot:</strong> เดินนับรถเป็นรอบ เหมาะกับหลายทางเข้าออก</li><li><strong>Entry/Exit:</strong> นับทุกประตูเพื่อคำนวณ accumulation เหมาะกับลานปิด</li><li><strong>Duration:</strong> ใช้รหัสนิรนามซ้ำเพื่อหาระยะเวลาจอด ห้ามบันทึกป้ายทะเบียนเต็ม</li></ul><h4>ข้อมูลที่เก็บ</h4><p>Zone, total spaces, ช่องปิดใช้งาน, occupied, จอดผิดช่อง, รถเข้า–ออก, snapshot และระยะเวลาจอด</p><h4>เตรียมงาน</h4><p>ทำแผนผังแบ่ง zone นับช่องจริง ช่องปิดใช้งาน และรถเริ่มต้นก่อนเวลาเก็บข้อมูล</p><h4>วิธีใช้</h4><ol><li>ตั้ง Zone, Capacity, Occupied, Unavailable และ Illegal</li><li>ใช้ Record inventory snapshot ตามรอบเวลาคงที่</li><li>หรือใช้ Enter/Exit เมื่อควบคุมทุกประตูได้</li><li>ใช้รหัสสั้นแบบนิรนามสำหรับ Start/End duration</li><li>ส่งออก CSV แล้วตรวจความต่อเนื่องของ accumulation</li></ol><h4>นำไปทำอะไรต่อ</h4><ul><li>สร้าง accumulation profile และหา peak occupancy</li><li>คำนวณ occupancy เทียบ effective supply</li><li>วิเคราะห์ duration distribution และ turnover</li><li>เปรียบเทียบ zone วันธรรมดา–วันหยุด หรือก่อน–หลังมาตรการ</li></ul><h4>ข้อควรระวัง</h4><p>แยก total supply จากช่องปิดใช้งาน ระบุรถนอกช่องต่างหาก พื้นที่หลายประตูต้องมีผู้สำรวจครบหรือใช้ snapshot และเก็บข้อมูลส่วนบุคคลเท่าที่จำเป็นเท่านั้น</p></div></details>
+    <details class="guideitem"><summary>Custom Survey / OD — ออกแบบแบบสำรวจเอง</summary><div class="guidebody"><h4>ใช้ทำไม</h4><p>ใช้เมื่อรูปแบบงานไม่ตรงกับเครื่องมือสำเร็จ เช่น OD survey การนับเส้นทางเข้า–ออกสถานี การนับประตู หรือหมวดเฉพาะของโครงการ</p><h4>ข้อมูลที่เก็บ</h4><p>ชื่อแบบสำรวจ จุดต้นทาง จุดปลายทาง เวลา จำนวนครั้ง หมายเหตุ และรูปผังอ้างอิงที่ผู้ใช้เลือก</p><h4>เตรียมงาน</h4><p>กำหนดขอบเขตพื้นที่ รหัส zone และนิยามการเดินทางหนึ่งครั้งให้ชัดเจน ตรวจว่าการเก็บข้อมูลไม่ระบุตัวบุคคลเกินจำเป็น</p><h4>วิธีใช้</h4><ol><li>ตั้งชื่อแบบสำรวจและใส่รายการต้นทาง–ปลายทางคั่นด้วยเครื่องหมายจุลภาค</li><li>เลือกรูปผังอ้างอิงขนาดไม่เกิน 1.5 MB รูปจะเก็บเฉพาะในอุปกรณ์</li><li>กดสร้างกระดาน แล้วกดช่อง O→D เมื่อพบการเดินทาง</li><li>Undo เมื่อลงผิด และ export CSV เมื่อจบช่วง</li></ol><h4>นำไปทำอะไรต่อ</h4><ul><li>สร้าง OD matrix และ desire-line diagram</li><li>หาคู่การเดินทางหลัก สัดส่วนเข้า–ออก และเปรียบเทียบช่วงเวลา</li><li>ใช้ประกอบการวางเส้นทาง ทางเข้าออก จุดรับส่ง หรือระบบขนส่ง</li></ul><h4>ข้อควรระวัง</h4><p>เครื่องมือนี้นับการเคลื่อนที่ตามที่สังเกต ไม่ใช่แบบสัมภาษณ์เต็มรูปแบบ ห้ามใส่ชื่อ เบอร์โทร ป้ายทะเบียนเต็ม หรือข้อมูลระบุตัวบุคคลในรหัส zone และต้องขอความยินยอมเมื่อรูปมีบุคคลชัดเจน</p></div></details>
   </div>
 </section>
 
 <section class="contactsection" id="contact">
   <h2 class="sectiontitle">ติดต่อเรา</h2>
   <p>มีข้อเสนอแนะ พบปัญหาการใช้งาน หรืออยากให้เพิ่มเครื่องมือแบบไหน<br>
-     ทักมาได้เลยที่ <a href="mailto:poramat.0hm1@gmail.com">poramat.0hm1@gmail.com</a></p>
+     ติดต่อมาที่ <a href="mailto:poramat.0hm1@gmail.com">poramat.0hm1@gmail.com</a></p>
 </section>
 
 <footer class="sitefoot">© 2026 TallyField — Built for field surveyors, by a field surveyor.</footer>
@@ -793,5 +918,6 @@
     });
   }
 </script>
+<script src="ui-shell.js"></script><script src="traffic-tools.js"></script>
 </body>
 </html>
