@@ -1,4 +1,4 @@
-const CACHE_NAME = "tallyfield-v12";
+const CACHE_NAME = "tallyfield-v13";
 const FILES_TO_CACHE = [
   "./index.html",
   "./manifest.json",
