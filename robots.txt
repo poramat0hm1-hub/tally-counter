@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://poramat0hm1-hub.github.io/tally-counter/sitemap.xml
