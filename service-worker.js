@@ -1,10 +1,11 @@
-const CACHE_NAME = "tallyfield-v9";
+const CACHE_NAME = "tallyfield-v11";
 const FILES_TO_CACHE = [
   "./index.html",
   "./manifest.json",
   "./traffic-tools.css",
   "./traffic-tools.js",
   "./ui-shell.js",
+  "./cloud-sync.js",
   "./icon-192.png",
   "./icon-512.png"
 ];
